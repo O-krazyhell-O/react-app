@@ -1,16 +1,121 @@
-# React + Vite
+# React Click Counter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Простое React-приложение, разработанное с использованием **React** и **Vite**.
+Приложение представляет собой счётчик кликов: при нажатии на кнопку текущее количество кликов увеличивается на единицу.
 
-Currently, two official plugins are available:
+Проект предназначен для демонстрации сборки React-приложения с использованием **Docker** и многоступенчатого Dockerfile.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Используемые технологии
 
-## React Compiler
+* React
+* Vite
+* JavaScript
+* Docker
+* Nginx
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Структура проекта
 
-## Expanding the ESLint configuration
+```text
+react-docker-app/
+├── public/
+├── src/
+│   ├── App.jsx
+│   ├── App.css
+│   ├── index.css
+│   └── main.jsx
+├── .dockerignore
+├── .gitignore
+├── Dockerfile
+├── index.html
+├── package-lock.json
+├── package.json
+└── vite.config.js
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Запуск приложения локально
+
+Для запуска проекта в режиме разработки необходимо установить зависимости:
+
+```bash
+npm install
+```
+
+После этого запустить Vite:
+
+```bash
+npm run dev
+```
+
+Приложение будет доступно по адресу:
+
+```text
+http://localhost:5173
+```
+
+## Сборка Docker-образа
+
+Для создания Docker-образа необходимо выполнить команду в корневой директории проекта:
+
+```bash
+docker build -t react-docker-app .
+```
+
+В процессе сборки используется многоступенчатый Dockerfile.
+
+На первом этапе выполняется установка зависимостей и production-сборка React-приложения с помощью Vite:
+
+```bash
+npm ci
+npm run build
+```
+
+Результат сборки помещается в директорию `dist`.
+
+На втором этапе используется Nginx, в который копируются собранные файлы приложения.
+
+## Запуск Docker-контейнера
+
+Для запуска контейнера необходимо выполнить:
+
+```bash
+docker run -d -p 8080:80 --name react-docker-app-container react-docker-app
+```
+
+После запуска приложение будет доступно по адресу:
+
+```text
+http://localhost:8080
+```
+
+## Скриншот работающего приложения
+
+![Скриншот работающего приложения](screenshots/screenshot.png)
+
+## Управление контейнером
+
+Просмотр запущенных контейнеров:
+
+```bash
+docker ps
+```
+
+Остановка контейнера:
+
+```bash
+docker stop react-docker-app-container
+```
+
+Удаление контейнера:
+
+```bash
+docker rm react-docker-app-container
+```
+
+## Dockerfile
+
+Проект использует многоступенчатую сборку:
+
+1. На первом этапе используется образ Node.js для установки зависимостей и сборки React-приложения.
+2. На втором этапе используется Nginx для запуска готовой production-версии приложения.
+
+Такой подход позволяет не включать исходный код и зависимости Node.js в финальный production-образ.
